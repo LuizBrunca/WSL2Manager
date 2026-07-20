@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import shutil
 import subprocess
 from dataclasses import dataclass
 
@@ -57,7 +56,7 @@ def start(name: str) -> None:
     try:
         subprocess.Popen(
             ["wsl.exe", "-d", name, "--", "sleep", "infinity"],
-            creationflags=subprocess.DETACHED_PROCESS | subprocess.CREATE_NO_WINDOW,
+            creationflags=subprocess.CREATE_NO_WINDOW,
             stdin=subprocess.DEVNULL,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
@@ -81,11 +80,7 @@ def shutdown_all() -> None:
 
 
 def open_terminal(name: str) -> None:
-    wt_path = shutil.which("wt.exe") or shutil.which("wt")
     try:
-        if wt_path:
-            subprocess.Popen([wt_path, "wsl.exe", "-d", name])
-        else:
-            subprocess.Popen(["wsl.exe", "-d", name])
+        subprocess.Popen(["wsl.exe", "-d", name])
     except FileNotFoundError as exc:
         raise WslNotFoundError("wsl.exe was not found on this machine") from exc

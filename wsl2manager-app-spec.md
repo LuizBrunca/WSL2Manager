@@ -31,7 +31,7 @@ A Python desktop application that runs continuously in the background and lets t
 | System tray icon | `pystray` | Tray icon + menu, including native checkable menu items (used for Manage Distros / Start with Windows). |
 | Tray icon image | `Pillow` | Load `assets/app.ico` into the bitmap `pystray` needs. |
 | WSL control | `subprocess` + `wsl.exe` | No native Python WSL API; wrap `wsl -l -v`, `wsl -d <name>`, `wsl -t <name>`, `wsl --shutdown`. |
-| Terminal launch | `subprocess` | `wt.exe -d <name>` if Windows Terminal is present, else fall back to `wsl.exe -d <name>`. |
+| Terminal launch | `subprocess` | `wsl.exe -d <name>` directly (opens its own console host window). `wt.exe` was tried first but dropped — its CLI argument parsing collides with `wsl.exe`'s own `-d` flag and proved unreliable in testing (see section 9). |
 | Single-instance guard | `pywin32` (`win32event.CreateMutex`) | Named mutex checked at startup; exit silently if already held. |
 | Config/settings | `.json` file | Maintained-distro list, Start-with-Windows flag. No poll interval — on-demand model needs none. |
 | Autostart on boot | Startup shortcut / registry `Run` key | Written/removed by the app itself when the "Start with Windows" item is toggled. |
@@ -91,6 +91,7 @@ wsl2manager-app/
 - **Autostart default**: opt-in, off by default.
 - **First-run distro selection**: all discovered distros auto-selected as maintained; user prunes via Manage Distros.
 - **Single instance**: enforced via named mutex.
+- **Open Terminal implementation**: always launches `wsl.exe -d <name>` directly, no `wt.exe` involvement. Tried `wt.exe -- wsl.exe -d <name>` (documented separator) and `wt.exe -p <name>` (profile-name lookup) during testing; both were unreliable (`-d` collision / no matching profile), each producing a visible error or silently falling back to the wrong shell. Plain `wsl.exe -d <name>` was confirmed to work reliably, so the fancier "open as a tab in Windows Terminal" behavior was dropped in favor of correctness.
 - **Config location/format**: `%APPDATA%\WSL2Manager\config.json`.
 - **`wsl.exe` missing**: app still runs in the tray with a disabled "WSL not found" item, re-checked on every menu open, rather than exiting.
 - **Open Terminal**: promoted to MVP (not deferred).
