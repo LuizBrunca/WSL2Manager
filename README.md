@@ -12,5 +12,5 @@ uv run run.py
 ## Packaging
 
 ```
-uv run pyinstaller --onefile --noconsole --icon assets/app.ico --name wsl2manager-app run.py
+uv run pyinstaller --onefile --noconsole --icon assets/app.ico --add-data "assets/app.ico;assets" --name wsl2manager-app run.py
 ```
