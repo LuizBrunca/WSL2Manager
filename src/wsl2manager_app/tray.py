@@ -17,8 +17,9 @@ _RUN_VALUE_NAME = "WSL2Manager"
 def _startup_command() -> str:
     if getattr(sys, "frozen", False):
         return f'"{sys.executable}"'
-    script = Path(sys.executable).parent / "wsl2manager-app.exe"
-    return f'"{script}"'
+    pythonw = Path(sys.executable).parent / "pythonw.exe"
+    script = Path(__file__).resolve().parents[2] / "run.py"
+    return f'"{pythonw}" "{script}"'
 
 
 def is_autostart_enabled() -> bool:
